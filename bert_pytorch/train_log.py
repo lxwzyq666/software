@@ -98,6 +98,8 @@ class Trainer():
                                       collate_fn=train_dataset.collate_fn, drop_last=True)
         self.valid_data_loader = DataLoader(valid_dataset, batch_size=self.batch_size, num_workers=self.num_workers,
                                        collate_fn=train_dataset.collate_fn, drop_last=True)
+        self.train_dataset = train_dataset
+        self.valid_dateset = valid_dataset
         del train_dataset
         del valid_dataset
         del logkey_train
@@ -137,8 +139,12 @@ class Trainer():
                 center = self.calculate_center([self.train_data_loader, self.valid_data_loader])
                 # center = self.calculate_center([self.train_data_loader])
                 self.trainer.hyper_center = center
-
+            self.trainer.train_data = DataLoader(self.train_dataset, batch_size=self.batch_size, num_workers=self.num_workers,
+                                      collate_fn=self.train_dataset.collate_fn, drop_last=True)
             _, train_dist = self.trainer.train(epoch)
+            self.trainer.valid_data = DataLoader(self.valid_dataset, batch_size=self.batch_size,
+                                                 num_workers=self.num_workers,
+                                                 collate_fn=self.valid_dataset.collate_fn, drop_last=True)
             avg_loss, valid_dist = self.trainer.valid(epoch)
             self.trainer.save_log(self.model_dir, surfix_log)
 
